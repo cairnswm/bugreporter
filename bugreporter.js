@@ -1,3 +1,4 @@
+// Utils
 function getWidth() {
     return Math.max(
       document.body.scrollWidth,
@@ -19,7 +20,6 @@ function getWidth() {
   }
 
 // CREATE 50% SCREEN SHOT
-
 async function getScreenShot(elementMouseIsOver) {
     var promise = new Promise(function(resolve, reject) {
         try {
@@ -50,6 +50,15 @@ async function getScreenShot(elementMouseIsOver) {
     });
     return promise;            
 }
+
+// ===================
+// BUGREPORTER
+// ===================
+// TODO: Make into an object that a user can reference - eg. bugReporter.<method>
+// TODO: Post image to server
+// TODO: Add object config (url, classes etc)
+// TODO: Add popup menu on right click, not immediatly create a but
+
 // SET UP BUGREPORTER ON PAGE RIGHT CLICK
 window.addEventListener("contextmenu", 
     function(e){
@@ -75,9 +84,9 @@ function openPopup(popupId) {
     popupModal.classList.add('is--visible');
     bodyBlackout.classList.add('is-blacked-out');
 }
-// GET BUGREPORTER BACKGROUND 
-const bodyBlackout = document.querySelector('.body-blackout');
+// INJECT BUGREPORTER HTML
 document.body.innerHTML = document.body.innerHTML + `
+    <div class="body-blackout"></div>
     <div class="bugreportermodal shadow" data-bugreportermodal="bugreport"> 
         <span class="text-white bg-primary bugreportermodal__close" style="right:10px;top:10px">X</span>
         <div class="font-weight-bold bugr-head">Log a Bug Report</div>
@@ -86,9 +95,11 @@ document.body.innerHTML = document.body.innerHTML + `
             <input type="text"></input>
             <button>Save</button>
         </div>
-        <div id="bugreport-image"></image>
+        <div class="bugreport-image" id="bugreport-image"></image>
     </div>
     `;
+// GET BUGREPORTER BACKGROUND 
+const bodyBlackout = document.querySelector('.body-blackout');
 // CREATE CLOSE POPUP EVENTS
 document.querySelector('.bugreportermodal__close').addEventListener('click', (event) => {
     popupModal = event.target.closest(".bugreportermodal");
@@ -107,6 +118,7 @@ document.querySelector('.bugreportermodal__close').addEventListener('click', (ev
         height: 100%;
         background-color: rgba(0, 0, 0, .65);
         display: none;
+        overflow: hidden;
     }
     
     .body-blackout.is-blacked-out {
@@ -130,7 +142,7 @@ document.querySelector('.bugreportermodal__close').addEventListener('click', (ev
         pointer-events: none;
         transition: all 300ms ease-in-out;
         z-index: 1011;
-        overflow:scroll;
+        border-radius: 5px;
     }
     .bugreportermodal.is--visible {
         opacity: 1;
@@ -147,6 +159,12 @@ document.querySelector('.bugreportermodal__close').addEventListener('click', (ev
     
     .bugr-head {
         font-size:large;
+    }
+    
+    .bugreport-image {  
+        height: 70%;      
+        overflow:auto;
+        position:absolute;
     }`;
     var styleSheet = document.createElement("style");
     styleSheet.type = "text/css";

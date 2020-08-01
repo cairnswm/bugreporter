@@ -23,3 +23,10 @@ Normal Javascript package
 jQuery add in
 
 React component
+
+## Send onSave or postURL
+
+onSave will recieve an HTML Input and an HTML Canvas as parameters
+setting postURL will cause BugReporter to send to that URL
+
+https://stackoverflow.com/questions/13198131/how-to-save-an-html5-canvas-as-an-image-on-a-server

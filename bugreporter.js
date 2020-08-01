@@ -29,11 +29,12 @@ window.addEventListener("contextmenu",
         console.log(e);
         BugReporter.execute(e);
         return false;
-        // https://stackoverflow.com/questions/13198131/how-to-save-an-html5-canvas-as-an-image-on-a-server
     }, false);
 
 const BugReporterClass = {
     version: function()  { return "0.0.1" },
+    onSave: undefined,
+    postURL: undefined,
 
     init: function() {
         this.createhtml();
@@ -61,45 +62,28 @@ const BugReporterClass = {
         // INJECT BUGREPORTER HTML
          document.body.innerHTML = document.body.innerHTML + `
              <div class="body-blackout hide"></div>
-        `;
-        //     <div class="bugreportermodal hide shadow" data-bugreportermodal="bugreport"> 
-        //         <span class="text-white bg-primary bugreportermodal__close" style="right:10px;top:10px">X</span>
-        //         <span aria-hidden="true">&times;</span>
-        //         <div class="font-weight-bold bugr-head">Log a Bug Report</div>
-        //         <div id="debugContent">
-        //             <div class="input-group mb-3">
-        //                 <input type="text" class="form-control" placeholder="Description" aria-label="Description of Bug" aria-describedby="button-addon2">
-        //                 <div class="input-group-append">
-        //                 <button class="btn btn-primary" type="button" id="button-addon2">Button</button>
-        //             </div>
-        //         </div>
-        //         </div>
-        //         <div class="debugImageContent">
-        //             <div class="bugreport-image" id="bugreport-image"></image>
-        //         </div>
-        //     </div>
-        //     `;
+            `;
             document.body.innerHTML = document.body.innerHTML + `            
             <div class="modal fade bugreportermodal" id="bugreport" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bugreportermodal="bugreport">
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                  <h5 class="modal-title" id="exampleModalLabel">Bug Reporter</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span id="bugreportermodal__close" aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
+                
+                    <span>Please describe what problem you have seen</span><br/>
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Description" aria-label="Description of Bug" aria-describedby="button-addon2">
+                        <input type="text" id="bugreporter__description" class="form-control" placeholder="Description" aria-label="Description of Bug" aria-describedby="button-addon2">
                         <div class="input-group-append">
                         <button class="bugreportermodal__close btn btn-primary" type="button" id="bugreporter__save1">Save</button>
                         </div>
                     </div>
+                    <div class="small text-muted">A good bug report will include an explanation of what you thought was wrong and an explanation of what you were execting.</div>
                     <div class="bugreport-image" id="bugreport-image"></image></div>
-                </div>
-                <div class="modal-footer">
-                  <button id="bugreporter__save2" type="button" class="btn btn-primary" onClick="() => BugReporter.closePopup()">Save changes</button>
                 </div>
               </div>
             </div>
@@ -108,27 +92,50 @@ const BugReporterClass = {
         this.bodyBlackout = document.querySelector('.body-blackout');        
         // CREATE CLOSE POPUP EVENTS
         document.querySelector('#bugreportermodal__close').addEventListener('click', (event) => {
-            BugReporter.closePopup();
+            this.save();
+            this.closePopup();
         })
         document.querySelector('#bugreporter__save1').addEventListener('click', (event) => {
-            BugReporter.closePopup();
-        })
-        document.querySelector('#bugreporter__save2').addEventListener('click', (event) => {
-            BugReporter.closePopup();
-        })
+            this.save();
+            this.closePopup();
+        });
     },
     openPopup(popupId) {
         const popupModal = document.querySelector(`[data-bugreportermodal="bugreport"]`);
-        popupModal.classList.add('is--visible');
+        popupModal.classList.add('visible');
         this.bodyBlackout.classList.add('is-blacked-out');
-        
         popupModal.classList.remove('fade');
     },
     closePopup(popupId) {
         const popupModal = document.querySelector(`[data-bugreportermodal="bugreport"]`);
-        popupModal.classList.remove('is--visible');
+        popupModal.classList.remove('visible');
         this.bodyBlackout.classList.remove('is-blacked-out');        
         popupModal.classList.add('fade');
+    },
+
+    
+        // https://stackoverflow.com/questions/13198131/how-to-save-an-html5-canvas-as-an-image-on-a-server
+    async save() {
+        if (this.onSave) {
+            this.onSave(document.getElementById("bugreporter__description"), document.getElementById("bugreport-image"));
+        } else if (this.postURL) {
+            var canvasData = document.getElementById("bugreport-image").toDataURL("image/png");
+            var inputData = document.getElementById("bugreporter__description").value;
+          
+            if (window.XMLHttpRequest) {
+              ajax = new XMLHttpRequest();
+            }
+            else if (window.ActiveXObject) {
+              ajax = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+          
+            ajax.open("POST", "testSave.php", false);
+            ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            ajax.onreadystatechange = function() {
+              console.log(ajax.responseText);
+            }
+            ajax.send("desc="+inputData+"&img=" + canvasData);
+        }
     },
 
     // CREATE 50% SCREEN SHOT

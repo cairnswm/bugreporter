@@ -23,5 +23,9 @@
 
     <script>
         console.log("Version of BugReporter",BugReporter.version());
+
+        BugReporter.onSave = (input,image) => {
+            alert(input.value);
+        }
     </script>
 </body>

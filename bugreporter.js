@@ -18,6 +18,17 @@ function getWidth() {
       document.documentElement.clientHeight
     );
   }
+  function getDataUrl(img) {
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    // Set width and height
+    canvas.width = img.width;
+    canvas.height = img.height;
+    // Draw the image
+    ctx.drawImage(img, 0, 0);
+    return canvas.toDataURL('image/png');
+ }
 
 // ===================
 // Header: BUGREPORTER
@@ -83,7 +94,7 @@ const BugReporterClass = {
                         </div>
                     </div>
                     <div class="small text-muted">A good bug report will include an explanation of what you thought was wrong and an explanation of what you were execting.</div>
-                    <div class="bugreport-image" id="bugreport-image"></image></div>
+                    <div class="bugreport-image" id="bugreport-image"></div>
                 </div>
               </div>
             </div>
@@ -119,7 +130,7 @@ const BugReporterClass = {
         if (this.onSave) {
             this.onSave(document.getElementById("bugreporter__description"), document.getElementById("bugreport-image"));
         } else if (this.postURL) {
-            var canvasData = document.getElementById("bugreport-image").toDataURL("image/png");
+            var canvasData = document.querySelector(".bugreport-image canvas").toDataURL('image/png');
             var inputData = document.getElementById("bugreporter__description").value;
           
             if (window.XMLHttpRequest) {
@@ -129,7 +140,7 @@ const BugReporterClass = {
               ajax = new ActiveXObject("Microsoft.XMLHTTP");
             }
           
-            ajax.open("POST", "testSave.php", false);
+            ajax.open("POST", this.postURL, false);
             ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             ajax.onreadystatechange = function() {
               console.log(ajax.responseText);
